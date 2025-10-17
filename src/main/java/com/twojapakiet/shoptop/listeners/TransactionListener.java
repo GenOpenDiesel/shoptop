@@ -17,8 +17,7 @@ public class TransactionListener implements Listener {
 
     @EventHandler
     public void onTransaction(PostTransactionEvent event) {
-        // Nowsze API nie używa już `Transaction.Result`, sprawdzamy `isSuccessful()`
-        if (!event.isSuccessful()) {
+        if (event.getTransactionResult() != Transaction.Result.SUCCESS) {
             return;
         }
 
@@ -26,9 +25,9 @@ public class TransactionListener implements Listener {
         double price = event.getPrice();
         Transaction.Type type = event.getTransactionType();
 
-        if (type == Transaction.Type.BUY_ITEM || type == Transaction.Type.BUY_STACK) {
+        if (type == Transaction.Type.BUY_SCREEN) {
             dataManager.addBuyValue(player.getUniqueId(), price);
-        } else if (type == Transaction.Type.SELL_ITEM || type == Transaction.Type.SELL_STACK || type == Transaction.Type.SELL_ALL_ITEMS) {
+        } else if (type == Transaction.Type.SELL_SCREEN || type == Transaction.Type.SELL_ALL_COMMAND || type == Transaction.Type.SELL_GUI_SCREEN) {
             dataManager.addSellValue(player.getUniqueId(), price);
         }
     }
