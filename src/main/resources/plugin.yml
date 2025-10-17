@@ -1,17 +1,6 @@
 name: ShopTop
 version: ${project.version}
 main: com.twojapakiet.shoptop.ShopTop
-api-version: 1.18
+api-version: '1.21'
 author: TwojaNazwa
-# Użyj softdepend dla obu wersji sklepu, aby zapewnić ładowanie po nich
 softdepend: [EconomyShopGUI, EconomyShopGUI-Premium, PlaceholderAPI]
-
-commands:
-  topkupno:
-    description: Wyświetla top 10 osób, które najwięcej kupiły w sklepie.
-    usage: /topkupno
-    aliases: [topbuy, topbuys]
-  topsprzedaz:
-    description: Wyświetla top 10 osób, które najwięcej sprzedały w sklepie.
-    usage: /topsprzedaz
-    aliases: [topsell, topsells]
