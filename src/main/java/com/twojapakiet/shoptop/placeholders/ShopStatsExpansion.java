@@ -5,6 +5,8 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 public class ShopStatsExpansion extends PlaceholderExpansion {
 
     private final DataManager dataManager;
@@ -15,7 +17,7 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "sklep_staty"; // Prefix placeholderów
+        return "sklep_staty";
     }
 
     @Override
@@ -25,7 +27,7 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.0";
+        return "2.0";
     }
 
     @Override
@@ -39,18 +41,18 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
             return "";
         }
 
-        // %sklep_staty_ilekupilem%
-        if (params.equalsIgnoreCase("ilekupilem")) {
-            double amount = dataManager.getBuyValue(player.getUniqueId());
-            return String.format("%,.2f", amount);
-        }
-
-        // %sklep_staty_ilesprzedalem%
-        if (params.equalsIgnoreCase("ilesprzedalem")) {
-            double amount = dataManager.getSellValue(player.getUniqueId());
-            return String.format("%,.2f", amount);
-        }
-
-        return null; // Zwróć null, jeśli placeholder jest niepoprawny
+        return switch (params.toLowerCase(Locale.ROOT)) {
+            // %sklep_staty_ilekupilem%
+            case "ilekupilem" -> {
+                double amount = dataManager.getBuyValue(player.getUniqueId());
+                yield String.format(Locale.US, "%,.2f", amount);
+            }
+            // %sklep_staty_ilesprzedalem%
+            case "ilesprzedalem" -> {
+                double amount = dataManager.getSellValue(player.getUniqueId());
+                yield String.format(Locale.US, "%,.2f", amount);
+            }
+            default -> null;
+        };
     }
 }
