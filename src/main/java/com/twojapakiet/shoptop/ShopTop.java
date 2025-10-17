@@ -37,8 +37,10 @@ public final class ShopTop extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Ostateczny zapis danych przy wyłączaniu serwera
+        // Ostateczny zapis danych przy wyłączaniu lub restarcie serwera.
+        // Ta metoda gwarantuje, że wszystkie statystyki zostaną zapisane.
         dataManager.saveData();
+        getLogger().info("Wszystkie statystyki graczy zostały zapisane przed wyłączeniem pluginu.");
         getLogger().info("Plugin ShopTop został wyłączony!");
     }
 }
