@@ -6,17 +6,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DataManager {
 
     private final JavaPlugin plugin;
-    private FileConfiguration dataConfig;
     private File dataFile;
+    private FileConfiguration dataConfig;
 
-    private final Map<UUID, Double> buyStats = new HashMap<>();
-    private final Map<UUID, Double> sellStats = new HashMap<>();
+    private final Map<UUID, Double> buyStats = new ConcurrentHashMap<>();
+    private final Map<UUID, Double> sellStats = new ConcurrentHashMap<>();
 
     public DataManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -24,57 +25,56 @@ public class DataManager {
     }
 
     public void addBuyValue(UUID uuid, double value) {
-        buyStats.put(uuid, buyStats.getOrDefault(uuid, 0.0) + value);
+        buyStats.merge(uuid, value, Double::sum);
     }
 
     public void addSellValue(UUID uuid, double value) {
-        sellStats.put(uuid, sellStats.getOrDefault(uuid, 0.0) + value);
+        sellStats.merge(uuid, value, Double::sum);
     }
-    
-    // Metody dla Placeholderów
+
     public double getBuyValue(UUID uuid) {
         return buyStats.getOrDefault(uuid, 0.0);
     }
-    
+
     public double getSellValue(UUID uuid) {
         return sellStats.getOrDefault(uuid, 0.0);
-    }
-
-    public LinkedHashMap<UUID, Double> getTopBuys(int limit) {
-        return buyStats.entrySet().stream()
-                .sorted(Map.Entry.<UUID, Double>comparingByValue().reversed())
-                .limit(limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-    }
-
-    public LinkedHashMap<UUID, Double> getTopSells(int limit) {
-        return sellStats.entrySet().stream()
-                .sorted(Map.Entry.<UUID, Double>comparingByValue().reversed())
-                .limit(limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     public void loadData() {
         if (dataConfig.contains("stats.buy")) {
             dataConfig.getConfigurationSection("stats.buy").getKeys(false).forEach(uuidString -> {
-                UUID uuid = UUID.fromString(uuidString);
-                double value = dataConfig.getDouble("stats.buy." + uuidString);
-                buyStats.put(uuid, value);
+                try {
+                    UUID uuid = UUID.fromString(uuidString);
+                    double amount = dataConfig.getDouble("stats.buy." + uuidString);
+                    buyStats.put(uuid, amount);
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Błędny format UUID w data.yml: " + uuidString);
+                }
             });
         }
         if (dataConfig.contains("stats.sell")) {
             dataConfig.getConfigurationSection("stats.sell").getKeys(false).forEach(uuidString -> {
-                UUID uuid = UUID.fromString(uuidString);
-                double value = dataConfig.getDouble("stats.sell." + uuidString);
-                sellStats.put(uuid, value);
+                try {
+                    UUID uuid = UUID.fromString(uuidString);
+                    double amount = dataConfig.getDouble("stats.sell." + uuidString);
+                    sellStats.put(uuid, amount);
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Błędny format UUID w data.yml: " + uuidString);
+                }
             });
         }
     }
 
-    public void saveData() {
+    public synchronized void saveData() {
+        // Tworzymy kopię, aby uniknąć problemów z współbieżnością podczas zapisu
+        Map<UUID, Double> buyStatsCopy = new ConcurrentHashMap<>(buyStats);
+        Map<UUID, Double> sellStatsCopy = new ConcurrentHashMap<>(sellStats);
+
+        // Czyszczenie starej sekcji
         dataConfig.set("stats", null);
-        buyStats.forEach((uuid, value) -> dataConfig.set("stats.buy." + uuid.toString(), value));
-        sellStats.forEach((uuid, value) -> dataConfig.set("stats.sell." + uuid.toString(), value));
+
+        buyStatsCopy.forEach((uuid, value) -> dataConfig.set("stats.buy." + uuid.toString(), value));
+        sellStatsCopy.forEach((uuid, value) -> dataConfig.set("stats.sell." + uuid.toString(), value));
 
         try {
             dataConfig.save(dataFile);
