@@ -34,11 +34,27 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
     public boolean persist() {
         return true;
     }
+    
+    // DODAJEMY: Metoda canRegister() - niektóre wersje PAPI tego wymagają
+    @Override
+    public boolean canRegister() {
+        return true;
+    }
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
-        // ZMIANA: Dodajemy .trim() aby usunąć przypadkowe białe znaki
+        // Debugowanie - logujemy każde zapytanie
+        System.out.println("[ShopTop Debug] Otrzymano zapytanie o placeholder: '" + params + "'");
+        
+        if (params == null) {
+            return null;
+        }
+        
+        // Czyścimy parametr z białych znaków i konwertujemy na małe litery
         final String cleanParams = params.trim().toLowerCase(Locale.ROOT);
+        
+        // Dodatkowe debugowanie
+        System.out.println("[ShopTop Debug] Po wyczyszczeniu: '" + cleanParams + "'");
 
         // TEST DIAGNOSTYCZNY
         if (cleanParams.equals("test")) {
@@ -63,8 +79,8 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
             return String.format(Locale.US, "%,.2f", amount);
         }
 
-        // Jeśli parametr jest nieznany, zwracamy null.
-        // PAPI pokaże wtedy literalny tekst placeholdera (np. %sklep_staty_cos%)
+        // Dla nieznanych parametrów logujemy i zwracamy null
+        System.out.println("[ShopTop Debug] Nieznany parametr: '" + cleanParams + "'");
         return null;
     }
 }
