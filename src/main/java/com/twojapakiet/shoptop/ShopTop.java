@@ -18,12 +18,19 @@ public final class ShopTop extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new TransactionListener(dataManager), this);
 
-        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new ShopStatsExpansion(dataManager).register();
-            getLogger().info("Pomyślnie zintegrowano z PlaceholderAPI.");
-        } else {
-            getLogger().warning("Nie znaleziono PlaceholderAPI! Placeholdery nie będą działać.");
-        }
+        // ### POCZĄTEK POPRAWKI ###
+        // Opóźniamy rejestrację PAPI o 1 tick serwera.
+        // Daje to pewność, że PlaceholderAPI jest już w pełni załadowane i gotowe
+        // na przyjmowanie nowych rozszerzeń (Expansion).
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                new ShopStatsExpansion(dataManager).register();
+                getLogger().info("Pomyślnie zintegrowano z PlaceholderAPI.");
+            } else {
+                getLogger().warning("Nie znaleziono PlaceholderAPI! Placeholdery nie będą działać.");
+            }
+        }, 1L); // 1L = opóźnienie o 1 tick
+        // ### KONIEC POPRAWKI ###
 
         // Uruchomienie asynchronicznego, cyklicznego zapisu danych
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
