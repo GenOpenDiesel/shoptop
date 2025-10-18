@@ -40,13 +40,16 @@ public final class ShopTop extends JavaPlugin {
                     getLogger().info("Opóźniona próba rejestracji: " + (delayedSuccess ? "SUKCES" : "NIEPOWODZENIE"));
                     
                     // Sprawdzamy czy ekspansja jest zarejestrowana
-                    if (PlaceholderAPI.getRegisteredExpansions().stream()
-                            .anyMatch(exp -> exp.getIdentifier().equals("sklep_staty"))) {
+                    if (expansion.isRegistered()) {
                         getLogger().info("✓ Ekspansja 'sklep_staty' jest ZAREJESTROWANA w PlaceholderAPI!");
                         getLogger().info("Dostępne placeholdery:");
                         getLogger().info("  - %sklep_staty_test%");
                         getLogger().info("  - %sklep_staty_ilekupilem%");
                         getLogger().info("  - %sklep_staty_ilesprzedalem%");
+                        
+                        // Test bezpośredniego parsowania
+                        String testResult = PlaceholderAPI.setPlaceholders(null, "%sklep_staty_test%");
+                        getLogger().info("Test parsowania: '%sklep_staty_test%' -> '" + testResult + "'");
                     } else {
                         getLogger().severe("✗ Ekspansja 'sklep_staty' NIE JEST zarejestrowana!");
                         getLogger().severe("Sprawdź czy PlaceholderAPI jest poprawnie zainstalowane.");
