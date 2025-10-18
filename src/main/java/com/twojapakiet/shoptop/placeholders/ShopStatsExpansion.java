@@ -2,9 +2,14 @@ package com.twojapakiet.shoptop.placeholders;
 
 import com.twojapakiet.shoptop.data.DataManager;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class ShopStatsExpansion extends PlaceholderExpansion {
@@ -13,6 +18,7 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
 
     public ShopStatsExpansion(DataManager dataManager) {
         this.dataManager = dataManager;
+        Bukkit.getLogger().info("[ShopTop] Tworzenie instancji ShopStatsExpansion");
     }
 
     @Override
@@ -35,52 +41,71 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
         return true;
     }
     
-    // DODAJEMY: Metoda canRegister() - niektóre wersje PAPI tego wymagają
     @Override
     public boolean canRegister() {
         return true;
     }
-
+    
+    // Dodajemy listę placeholderów
     @Override
-    public String onRequest(OfflinePlayer player, @NotNull String params) {
-        // Debugowanie - logujemy każde zapytanie
-        System.out.println("[ShopTop Debug] Otrzymano zapytanie o placeholder: '" + params + "'");
+    public @NotNull List<String> getPlaceholders() {
+        return Arrays.asList(
+            "test",
+            "ilekupilem", 
+            "ilesprzedalem"
+        );
+    }
+
+    // Główna metoda - z Player
+    @Override
+    public String onPlaceholderRequest(Player player, @NotNull String params) {
+        Bukkit.getLogger().info("[ShopTop] onPlaceholderRequest z Player: '" + params + "' dla gracza: " + (player != null ? player.getName() : "null"));
         
-        if (params == null) {
-            return null;
+        if (params.equalsIgnoreCase("test")) {
+            return "TEST_Z_PLAYER";
         }
         
-        // Czyścimy parametr z białych znaków i konwertujemy na małe litery
-        final String cleanParams = params.trim().toLowerCase(Locale.ROOT);
-        
-        // Dodatkowe debugowanie
-        System.out.println("[ShopTop Debug] Po wyczyszczeniu: '" + cleanParams + "'");
-
-        // TEST DIAGNOSTYCZNY
-        if (cleanParams.equals("test")) {
-            return "TEST_OK";
+        if (player == null) {
+            return "BRAK_GRACZA";
         }
-
-        if (cleanParams.equals("ilekupilem")) {
-            // Jeśli player jest null (np. na hologramie), zwróć "0.00"
-            if (player == null) {
-                return "0.00";
-            }
+        
+        if (params.equalsIgnoreCase("ilekupilem")) {
             double amount = dataManager.getBuyValue(player.getUniqueId());
             return String.format(Locale.US, "%,.2f", amount);
         }
-
-        if (cleanParams.equals("ilesprzedalem")) {
-            // Jeśli player jest null, zwróć "0.00"
-            if (player == null) {
-                return "0.00";
-            }
+        
+        if (params.equalsIgnoreCase("ilesprzedalem")) {
             double amount = dataManager.getSellValue(player.getUniqueId());
             return String.format(Locale.US, "%,.2f", amount);
         }
+        
+        return "NIEZNANY_PARAMETR";
+    }
 
-        // Dla nieznanych parametrów logujemy i zwracamy null
-        System.out.println("[ShopTop Debug] Nieznany parametr: '" + cleanParams + "'");
+    // Metoda z OfflinePlayer - MUSI być zaimplementowana
+    @Override
+    public String onRequest(@Nullable OfflinePlayer player, @NotNull String params) {
+        Bukkit.getLogger().info("[ShopTop] onRequest z OfflinePlayer: '" + params + "' dla gracza: " + (player != null ? player.getName() : "null"));
+        
+        if (params.equalsIgnoreCase("test")) {
+            return "TEST_OFFLINE";
+        }
+        
+        if (player == null) {
+            return "0.00";
+        }
+        
+        if (params.equalsIgnoreCase("ilekupilem")) {
+            double amount = dataManager.getBuyValue(player.getUniqueId());
+            return String.format(Locale.US, "%,.2f", amount);
+        }
+        
+        if (params.equalsIgnoreCase("ilesprzedalem")) {
+            double amount = dataManager.getSellValue(player.getUniqueId());  
+            return String.format(Locale.US, "%,.2f", amount);
+        }
+        
+        Bukkit.getLogger().warning("[ShopTop] Nieznany placeholder: " + params);
         return null;
     }
 }
