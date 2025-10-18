@@ -20,43 +20,29 @@ public final class ShopTop extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new TransactionListener(dataManager), this);
 
-        // Rejestracja PlaceholderAPI z debugowaniem
+        // Rejestracja PlaceholderAPI
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            getLogger().info("PlaceholderAPI znalezione! Próba rejestracji...");
+            getLogger().info("PlaceholderAPI znalezione. Rejestrowanie ekspansji 'sklep_staty'...");
             
-            // Tworzymy ekspansję
             expansion = new ShopStatsExpansion(dataManager);
+            boolean success = expansion.register();
             
-            // Próbujemy zarejestrować natychmiast
-            boolean immediateSuccess = expansion.register();
-            getLogger().info("Natychmiastowa próba rejestracji: " + (immediateSuccess ? "SUKCES" : "NIEPOWODZENIE"));
-            
-            if (!immediateSuccess) {
-                // Jeśli nie udało się natychmiast, próbujemy z opóźnieniem
-                getLogger().info("Próba rejestracji z opóźnieniem 2 sekund...");
+            // Sprawdzamy, czy rejestracja się powiodła I czy PAPI potwierdza, że ekspansja jest zarejestrowana
+            if (success && expansion.isRegistered()) {
+                getLogger().info("✓ Ekspansja 'sklep_staty' została pomyślnie ZAREJESTROWANA!");
+                getLogger().info("Dostępne placeholdery:");
+                getLogger().info("  - %sklep_staty_test%");
+                getLogger().info("  - %sklep_staty_ilekupilem%");
+                getLogger().info("  - %sklep_staty_ilesprzedalem%");
                 
-                Bukkit.getScheduler().runTaskLater(this, () -> {
-                    boolean delayedSuccess = expansion.register();
-                    getLogger().info("Opóźniona próba rejestracji: " + (delayedSuccess ? "SUKCES" : "NIEPOWODZENIE"));
-                    
-                    // Sprawdzamy czy ekspansja jest zarejestrowana
-                    if (expansion.isRegistered()) {
-                        getLogger().info("✓ Ekspansja 'sklep_staty' jest ZAREJESTROWANA w PlaceholderAPI!");
-                        getLogger().info("Dostępne placeholdery:");
-                        getLogger().info("  - %sklep_staty_test%");
-                        getLogger().info("  - %sklep_staty_ilekupilem%");
-                        getLogger().info("  - %sklep_staty_ilesprzedalem%");
-                        
-                        // Test bezpośredniego parsowania
-                        String testResult = PlaceholderAPI.setPlaceholders(null, "%sklep_staty_test%");
-                        getLogger().info("Test parsowania: '%sklep_staty_test%' -> '" + testResult + "'");
-                    } else {
-                        getLogger().severe("✗ Ekspansja 'sklep_staty' NIE JEST zarejestrowana!");
-                        getLogger().severe("Sprawdź czy PlaceholderAPI jest poprawnie zainstalowane.");
-                    }
-                }, 40L);
+                // Test bezpośredniego parsowania (uwaga: player jest null, więc użyje onRequest(null, ...))
+                // Powinno to wywołać logikę "TEST_OFFLINE" z ShopStatsExpansion
+                String testResult = PlaceholderAPI.setPlaceholders(null, "%sklep_staty_test%");
+                getLogger().info("Test parsowania (onRequest(null)): '%sklep_staty_test%' -> '" + testResult + "' (oczekiwano 'TEST_OFFLINE')");
+
             } else {
-                getLogger().info("✓ Ekspansja zarejestrowana natychmiast!");
+                getLogger().severe("✗ NIEPOWODZENIE! Ekspansja 'sklep_staty' NIE MOGŁA zostać zarejestrowana!");
+                getLogger().severe("Możliwe przyczyny: Inny plugin już zarejestrował 'sklep_staty', lub błąd w PAPI.");
             }
         } else {
             getLogger().warning("PlaceholderAPI nie znalezione! Placeholdery nie będą działać.");
