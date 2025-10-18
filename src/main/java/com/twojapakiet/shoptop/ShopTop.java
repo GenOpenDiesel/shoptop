@@ -19,17 +19,28 @@ public final class ShopTop extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TransactionListener(dataManager), this);
 
         // ### POCZĄTEK POPRAWKI ###
-        // Opóźniamy rejestrację PAPI o 1 tick serwera.
-        // Daje to pewność, że PlaceholderAPI jest już w pełni załadowane i gotowe
-        // na przyjmowanie nowych rozszerzeń (Expansion).
+        // Opóźniamy rejestrację PAPI.
+        // Opóźnienie 1 tick (1L) jest prawie zawsze niewystarczające i powoduje "race condition".
+        // PlaceholderAPI jest "włączone", ale nie jest gotowe na przyjmowanie nowych dodatków.
+        // Zwiększamy opóźnienie do 2 sekund (40 ticków), aby dać serwerowi i PAPI czas na pełne załadowanie.
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                new ShopStatsExpansion(dataManager).register();
-                getLogger().info("Pomyślnie zintegrowano z PlaceholderAPI.");
+
+                // WAŻNE: Sprawdzamy, czy rejestracja się faktycznie powiodła.
+                // Metoda .register() zwraca boolean informujący o sukcesie.
+                boolean success = new ShopStatsExpansion(dataManager).register();
+
+                if (success) {
+                    getLogger().info("Pomyślnie zintegrowano i ZAREJESTROWANO dodatek 'sklep_staty' w PlaceholderAPI.");
+                } else {
+                    // Ten błąd jest kluczowy. Jeśli go zobaczysz, PAPI odrzuciło dodatek.
+                    getLogger().severe("Próbowano zintegrować się z PAPI, ale rejestracja dodatku 'sklep_staty' NIE powiodła się (register() zwróciło false)!");
+                }
+                
             } else {
                 getLogger().warning("Nie znaleziono PlaceholderAPI! Placeholdery nie będą działać.");
             }
-        }, 1L); // 1L = opóźnienie o 1 tick
+        }, 40L); // <-- ZMIANA: Z 1L na 40L (opóźnienie o 2 sekundy)
         // ### KONIEC POPRAWKI ###
 
         // Uruchomienie asynchronicznego, cyklicznego zapisu danych
