@@ -1,10 +1,8 @@
 package com.twojapakiet.shoptop.placeholders;
 
-import com.twojapakiet.shoptop.data.DataManager;
+import com.twojapakiet.shoptop.ShopTop; // Importujemy główną klasę
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,11 +12,12 @@ import java.util.Locale;
 
 public class ShopStatsExpansion extends PlaceholderExpansion {
 
-    private final DataManager dataManager;
+    // Zmieniamy DataManager na główną klasę pluginu, tak jak w przykładzie
+    private final ShopTop plugin;
 
-    public ShopStatsExpansion(DataManager dataManager) {
-        this.dataManager = dataManager;
-        Bukkit.getLogger().info("[ShopTop] Tworzenie instancji ShopStatsExpansion");
+    // Konstruktor przyjmuje główną klasę pluginu
+    public ShopStatsExpansion(ShopTop plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -28,12 +27,12 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return "TwojaNazwa";
+        return "TwojaNazwa"; // Możesz zmienić na "Fragmer2" jeśli chcesz
     }
 
     @Override
     public @NotNull String getVersion() {
-        return "2.0";
+        return "2.1"; // Zmieniona wersja po poprawce
     }
 
     @Override
@@ -46,7 +45,6 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
         return true;
     }
     
-    // Dodajemy listę placeholderów
     @Override
     public @NotNull List<String> getPlaceholders() {
         return Arrays.asList(
@@ -56,56 +54,32 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
         );
     }
 
-    // Główna metoda - z Player
-    @Override
-    public String onPlaceholderRequest(Player player, @NotNull String params) {
-        Bukkit.getLogger().info("[ShopTop] onPlaceholderRequest z Player: '" + params + "' dla gracza: " + (player != null ? player.getName() : "null"));
-        
-        if (params.equalsIgnoreCase("test")) {
-            return "TEST_Z_PLAYER";
-        }
-        
-        if (player == null) {
-            return "BRAK_GRACZA";
-        }
-        
-        if (params.equalsIgnoreCase("ilekupilem")) {
-            double amount = dataManager.getBuyValue(player.getUniqueId());
-            return String.format(Locale.US, "%,.2f", amount);
-        }
-        
-        if (params.equalsIgnoreCase("ilesprzedalem")) {
-            double amount = dataManager.getSellValue(player.getUniqueId());
-            return String.format(Locale.US, "%,.2f", amount);
-        }
-        
-        return "NIEZNANY_PARAMETR";
-    }
-
-    // Metoda z OfflinePlayer - MUSI być zaimplementowana
+    // ZOSTAWIMY TYLKO TĘ METODĘ - tak jak w przykładzie
+    // PAPI automatycznie użyje jej dla graczy online i offline
     @Override
     public String onRequest(@Nullable OfflinePlayer player, @NotNull String params) {
-        Bukkit.getLogger().info("[ShopTop] onRequest z OfflinePlayer: '" + params + "' dla gracza: " + (player != null ? player.getName() : "null"));
         
         if (params.equalsIgnoreCase("test")) {
-            return "TEST_OFFLINE";
+            return "TEST_Z_ONREQUEST"; // Zwracamy z tej metody
         }
         
         if (player == null) {
+            // Jeśli PAPI z jakiegoś powodu wyśle null gracza
             return "0.00";
         }
         
+        // Pobieramy DataManager z instancji pluginu
         if (params.equalsIgnoreCase("ilekupilem")) {
-            double amount = dataManager.getBuyValue(player.getUniqueId());
+            double amount = plugin.getDataManager().getBuyValue(player.getUniqueId());
             return String.format(Locale.US, "%,.2f", amount);
         }
         
         if (params.equalsIgnoreCase("ilesprzedalem")) {
-            double amount = dataManager.getSellValue(player.getUniqueId());  
+            double amount = plugin.getDataManager().getSellValue(player.getUniqueId());  
             return String.format(Locale.US, "%,.2f", amount);
         }
         
-        Bukkit.getLogger().warning("[ShopTop] Nieznany placeholder: " + params);
-        return null;
+        // Tak jak w przykładzie, zwracamy null dla nieznanego parametru
+        return null; 
     }
 }
