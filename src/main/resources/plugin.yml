@@ -3,4 +3,6 @@ version: ${project.version}
 main: com.twojapakiet.shoptop.ShopTop
 api-version: '1.21'
 author: TwojaNazwa
-softdepend: [EconomyShopGUI, EconomyShopGUI-Premium, PlaceholderAPI]
+# WAŻNE: depend wymusza ładowanie PO tych pluginach
+depend: [PlaceholderAPI]
+softdepend: [EconomyShopGUI, EconomyShopGUI-Premium]
