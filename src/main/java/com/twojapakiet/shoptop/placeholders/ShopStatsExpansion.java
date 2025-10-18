@@ -37,22 +37,31 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (player == null) {
-            return "";
+        // Używamy prostego if/else zamiast switcha dla pewności
+        String lowerParams = params.toLowerCase(Locale.ROOT);
+
+        if (lowerParams.equals("ilekupilem")) {
+            // Jeśli player jest null (np. na hologramie), zwróć "0.00" zgodnie z prośbą
+            if (player == null) {
+                return "0.00";
+            }
+            // getBuyValue dzięki getOrDefault (w DataManager) zwróci 0.0 dla nowego gracza
+            double amount = dataManager.getBuyValue(player.getUniqueId());
+            return String.format(Locale.US, "%,.2f", amount);
         }
 
-        return switch (params.toLowerCase(Locale.ROOT)) {
-            // %sklep_staty_ilekupilem%
-            case "ilekupilem" -> {
-                double amount = dataManager.getBuyValue(player.getUniqueId());
-                yield String.format(Locale.US, "%,.2f", amount);
+        if (lowerParams.equals("ilesprzedalem")) {
+            // Jeśli player jest null, zwróć "0.00"
+            if (player == null) {
+                return "0.00";
             }
-            // %sklep_staty_ilesprzedalem%
-            case "ilesprzedalem" -> {
-                double amount = dataManager.getSellValue(player.getUniqueId());
-                yield String.format(Locale.US, "%,.2f", amount);
-            }
-            default -> null;
-        };
+            // getSellValue dzięki getOrDefault (w DataManager) zwróci 0.0 dla nowego gracza
+            double amount = dataManager.getSellValue(player.getUniqueId());
+            return String.format(Locale.US, "%,.2f", amount);
+        }
+
+        // Jeśli parametr jest nieznany (np. %sklep_staty_cos%),
+        // zwracamy null, aby PAPI pokazało literal string (to jest poprawne zachowanie).
+        return null;
     }
 }
