@@ -9,7 +9,7 @@ api-version: '1.21'
 # Definiuje zależności i gwarantuje, że ShopTop
 # załaduje się ZAWSZE PO nich.
 dependencies:
-  - name: EconomyShopGUI-premium
+  - name: EconomyShopGUI-Premium
     required: true
     load: BEFORE # Oznacza, że EconomyShopGUI musi załadować się PRZED ShopTop
   - name: PlaceholderAPI
