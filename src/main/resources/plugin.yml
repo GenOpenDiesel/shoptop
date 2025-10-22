@@ -2,14 +2,7 @@ name: ShopTop
 version: ${project.version}
 main: com.twojapakiet.shoptop.ShopTop
 api-version: '1.21'
-load: POSTWORLD
 author: TwojaNazwa
-softdepend: [EconomyShopGUI-Premium, PlaceholderAPI]
+softdepend: [EconomyShopGUI, EconomyShopGUI-Premium, PlaceholderAPI]
 
-
-commands:
-  shoptop:
-    description: Główna komenda pluginu ShopTop
-    aliases: [st]
-    permission: shoptop.admin
-    usage: /<command> reload
+# Cała sekcja 'commands:' została stąd USUNIĘTA.
