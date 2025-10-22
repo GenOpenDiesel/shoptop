@@ -1,6 +1,5 @@
 package com.twojapakiet.shoptop;
 
-// Import dla nowej komendy
 import com.twojapakiet.shoptop.commands.ReloadCommand; 
 import com.twojapakiet.shoptop.data.DataManager;
 import com.twojapakiet.shoptop.listeners.TransactionListener;
@@ -29,8 +28,9 @@ public final class ShopTop extends JavaPlugin {
             getLogger().warning("PlaceholderAPI nie znalezione! Placeholdery nie będą działać.");
         }
         
-        // NOWA LINIA: Rejestracja komendy
-        getCommand("shoptop").setExecutor(new ReloadCommand(this));
+        // ZMIANA TUTAJ: Rejestrujemy komendę ręcznie w CommandMap
+        // Usuwamy: getCommand("shoptop").setExecutor(new ReloadCommand(this));
+        getServer().getCommandMap().register("shoptop", new ReloadCommand(this));
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             dataManager.saveData();
@@ -49,23 +49,14 @@ public final class ShopTop extends JavaPlugin {
         getLogger().info("Plugin ShopTop został wyłączony!");
     }
 
-    // NOWA METODA DO PRZEŁADOWANIA
     public void reloadPlugin() {
         getLogger().info("Rozpoczynanie przeładowania pluginu ShopTop...");
-
-        // 1. Zapisz bieżące dane (na wszelki wypadek)
         dataManager.saveData();
-
-        // 2. Wyczyść stare dane z pamięci
         dataManager.clearData();
-
-        // 3. Załaduj dane na nowo z pliku
         dataManager.loadData();
-        
         getLogger().info("Plugin ShopTop został pomyślnie przeładowany!");
     }
 
-    // Gettery (bez zmian)
     public static ShopTop getInstance() {
         return instance;
     }
