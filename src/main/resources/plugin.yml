@@ -3,6 +3,6 @@ version: ${project.version}
 main: com.twojapakiet.shoptop.ShopTop
 api-version: '1.21'
 author: TwojaNazwa
-softdepend: [EconomyShopGUI, EconomyShopGUI-Premium, PlaceholderAPI]
+softdepend: [EconomyShopGUI-Premium, PlaceholderAPI]
 
 # Cała sekcja 'commands:' została stąd USUNIĘTA.
