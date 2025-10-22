@@ -12,27 +12,26 @@ import java.util.Locale;
 
 public class ShopStatsExpansion extends PlaceholderExpansion {
 
-    // Zmieniamy DataManager na główną klasę pluginu, tak jak w przykładzie
     private final ShopTop plugin;
 
-    // Konstruktor przyjmuje główną klasę pluginu
     public ShopStatsExpansion(ShopTop plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public @NotNull String getIdentifier() {
-        return "sklep_staty";
+        // ZMIANA 1: Zmieniono identyfikator z "sklep_staty" na "shoptop"
+        return "shoptop";
     }
 
     @Override
     public @NotNull String getAuthor() {
-        return "TwojaNazwa"; // Możesz zmienić na "Fragmer2" jeśli chcesz
+        return "TwojaNazwa"; 
     }
 
     @Override
     public @NotNull String getVersion() {
-        return "2.1"; // Zmieniona wersja po poprawce
+        return "2.2"; // Podbita wersja po zmianach
     }
 
     @Override
@@ -47,39 +46,37 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
     
     @Override
     public @NotNull List<String> getPlaceholders() {
+        // ZMIANA 2: Aktualizacja listy dla PAPI (opcjonalne, ale dobra praktyka)
         return Arrays.asList(
             "test",
-            "ilekupilem", 
-            "ilesprzedalem"
+            "kupile", 
+            "sellile"
         );
     }
 
-    // ZOSTAWIMY TYLKO TĘ METODĘ - tak jak w przykładzie
-    // PAPI automatycznie użyje jej dla graczy online i offline
     @Override
     public String onRequest(@Nullable OfflinePlayer player, @NotNull String params) {
         
         if (params.equalsIgnoreCase("test")) {
-            return "TEST_Z_ONREQUEST"; // Zwracamy z tej metody
+            return "TEST_Z_ONREQUEST"; 
         }
         
         if (player == null) {
-            // Jeśli PAPI z jakiegoś powodu wyśle null gracza
             return "0.00";
         }
         
-        // Pobieramy DataManager z instancji pluginu
-        if (params.equalsIgnoreCase("ilekupilem")) {
+        // ZMIANA 3: Zmieniono "ilekupilem" na "kupile"
+        if (params.equalsIgnoreCase("kupile")) {
             double amount = plugin.getDataManager().getBuyValue(player.getUniqueId());
             return String.format(Locale.US, "%,.2f", amount);
         }
         
-        if (params.equalsIgnoreCase("ilesprzedalem")) {
+        // ZMIANA 4: Zmieniono "ilesprzedalem" na "sellile"
+        if (params.equalsIgnoreCase("sellile")) {
             double amount = plugin.getDataManager().getSellValue(player.getUniqueId());  
             return String.format(Locale.US, "%,.2f", amount);
         }
         
-        // Tak jak w przykładzie, zwracamy null dla nieznanego parametru
         return null; 
     }
 }
