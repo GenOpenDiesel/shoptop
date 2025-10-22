@@ -4,4 +4,4 @@ main: com.twojapakiet.shoptop.ShopTop
 api-version: '1.21'
 load: POSTWORLD
 author: TwojaNazwa
-softdepend: [EconomyShopGUI, EconomyShopGUI-Premium, PlaceholderAPI]
+softdepend: [EconomyShopGUI-Premium, PlaceholderAPI]
