@@ -68,13 +68,15 @@ public class ShopStatsExpansion extends PlaceholderExpansion {
         // ZMIANA 3: Zmieniono "ilekupilem" na "kupile"
         if (params.equalsIgnoreCase("kupile")) {
             double amount = plugin.getDataManager().getBuyValue(player.getUniqueId());
-            return String.format(Locale.US, "%,.2f", amount);
+            // POPRAWKA: Usunięto przecinek (,) z formatowania, aby Topper mógł parsować liczbę
+            return String.format(Locale.US, "%.2f", amount);
         }
         
         // ZMIANA 4: Zmieniono "ilesprzedalem" na "sellile"
         if (params.equalsIgnoreCase("sellile")) {
             double amount = plugin.getDataManager().getSellValue(player.getUniqueId());  
-            return String.format(Locale.US, "%,.2f", amount);
+            // POPRAWKA: Usunięto przecinek (,) z formatowania, aby Topper mógł parsować liczbę
+            return String.format(Locale.US, "%.2f", amount);
         }
         
         return null; 
