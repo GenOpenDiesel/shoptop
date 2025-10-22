@@ -1,0 +1,17 @@
+# Plik konfiguracyjny specyficzny dla Paper.
+# Zapewnia lepszą kontrolę nad ładowaniem pluginu.
+name: ShopTop
+version: ${project.version}
+main: com.twojapakiet.shoptop.ShopTop
+api-version: '1.21'
+
+# To jest najważniejsza sekcja dla Ciebie:
+# Definiuje zależności i gwarantuje, że ShopTop
+# załaduje się ZAWSZE PO nich.
+dependencies:
+  - name: EconomyShopGUI-premium
+    required: true
+    load: BEFORE # Oznacza, że EconomyShopGUI musi załadować się PRZED ShopTop
+  - name: PlaceholderAPI
+    required: true
+    load: BEFORE # Oznacza, że PlaceholderAPI musi załadować się PRZED ShopTop
