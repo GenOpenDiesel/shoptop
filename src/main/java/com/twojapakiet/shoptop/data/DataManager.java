@@ -83,6 +83,12 @@ public class DataManager {
             e.printStackTrace();
         }
     }
+    
+    // NOWA METODA
+    public void clearData() {
+        buyStats.clear();
+        sellStats.clear();
+    }
 
     private void createDataFile() {
         dataFile = new File(plugin.getDataFolder(), "data.yml");
